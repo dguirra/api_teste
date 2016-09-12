@@ -17,11 +17,8 @@ def teste():
 @app.route("/addone/<string:insert>")
 def add(insert):
     cur = mysql.connection.cursor()
-    cur.execute('''SELECT MAX(id) FROM pessoas''')
-    maxid = cur.fetchone()
-    cur.execute('''INSERT INTO pessoas (id, nome) VALUES (%s, %s)''', (maxid[0] + 1, insert))
+    cur.execute('''INSERT INTO pessoas (id, nome) VALUES (%s, %s)''', (id[0] + 1, insert))
     mysql.connection.commit()
-    return "Done"
-
+    return str (id, nome)
 if __name__ == '__main__':
     app.run(debug=True)
