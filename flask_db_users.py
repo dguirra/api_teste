@@ -20,8 +20,6 @@ class User(db.Model):
 
 @app.route('/user', methods=["POST"])
 def add():
-    import ipdb
-    ipdb.set_trace()
     data = request.json
     if isinstance(data, dict):  # Checa se é 'dict'
         user = User()
