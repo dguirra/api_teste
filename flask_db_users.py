@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
+from flask_db_occupation import Occupation
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/cadastro'
 db = SQLAlchemy(app)
-
-
-class Occupation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    occupation = db.Column(db.String(100), unique=True, nullable=False)
 
 
 class User(db.Model):
@@ -23,13 +20,15 @@ class User(db.Model):
 
 @app.route('/user', methods=["POST"])
 def add():
+    import ipdb
+    ipdb.set_trace()
     data = request.json
     if isinstance(data, dict):  # Checa se é 'dict'
         user = User()
         user.name = data.get('name')
         user.last_name = data.get('last_name')
         user.birth = data.get('birth')
-        _occupation = Occupation.query.filter_by(occupation=data.get('occupation')).one()
+        _occupation = Occupation.query.filter_by(description=data.get('occupation')).one()
         user.id_occupation = _occupation.id
         db.session.add(user)
 
@@ -39,7 +38,7 @@ def add():
             user.name = row.get('name')
             user.last_name = row.get('last_name')
             user.birth = row.get('birth')
-            _occupation = Occupation.query.filter_by(occupation=row.get('occupation')).one()
+            _occupation = Occupation.query.filter_by(description=row.get('occupation')).one()
             user.id_occupation = _occupation.id
             db.session.add(user)
     else:
@@ -47,16 +46,22 @@ def add():
     db.session.commit()
 
     return jsonify({"name": user.name, "last_name": user.last_name,
-                    "birth": user.birth, "occupation": user.occupation,
-                    "occupation": _occupation.occupation, "id": user.id})
-
-
-@app.route('/user/<id>')  # Por default é GET
-def getuser(id):
-    user = User.query.filter_by(id=id).first_or_404()
-    return jsonify({"name": user.name, "last_name": user.last_name,
-                    "birth": user.birth, "occupation": user.occupation,
+                    "birth": user.birth, "id_occupation": _occupation.occupation,
                     "id": user.id})
+
+
+@app.route('/user/<params>')  # Por default é GET
+def get_user(params):
+    user = User.query.filter(or_(User.id == params,
+                             User.name == params)).all()
+    x = []
+    if not user:
+        print ('A busca na retornou nenhum resultado')
+    for row in user:
+        x.append({"name": row.name, "last_name": row.last_name,
+                  "birth": row.birth, "occupation": row.id_occupation,
+                  "id": row.id})
+    return jsonify(x)
 
 
 @app.route('/user/<id>', methods=["DELETE"])
