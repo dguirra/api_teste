@@ -2,7 +2,7 @@
 from flask import Flask, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
-from flask_db_occupation import Occupation
+from flask_db_occupation import Occupation  # Importando a class Occupation
 
 
 app = Flask(__name__)
@@ -19,11 +19,11 @@ class User(db.Model):
 
 
 @app.route('/user', methods=["POST"])
-def add():
-    data = request.json
+def add_user():
+    data = request.json  # 'data' recebendo parametros em JSON
     if isinstance(data, dict):  # Checa se é 'dict'
         user = User()
-        user.name = data.get('name')
+        user.name = data.get('name')  # O "('name')" é o parametro usado pelo JSON
         user.last_name = data.get('last_name')
         user.birth = data.get('birth')
         _occupation = Occupation.query.filter_by(description=data.get('occupation')).one()
@@ -31,7 +31,7 @@ def add():
         db.session.add(user)
 
     elif isinstance(data, list):  # Checa se é 'list'
-        for row in data:
+        for row in data:  # O for é um laço para armazenar (no caso em 'data') os dados da lista
             user = User()
             user.name = row.get('name')
             user.last_name = row.get('last_name')
@@ -54,7 +54,7 @@ def get_user(params):
                              User.name == params)).all()
     x = []
     if not user:
-        print ('A busca na retornou nenhum resultado')
+        return jsonify({"Status": "Fail", "mensagem": "A busca na retornou nenhum resultado"})
     for row in user:
         x.append({"name": row.name, "last_name": row.last_name,
                   "birth": row.birth, "occupation": row.id_occupation,
