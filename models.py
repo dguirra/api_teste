@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+from sqlalchemy.orm import relationship
+from api_teste import db
+
+
 class Occupation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     occupation = db.Column(db.String(100), unique=True, nullable=False)
