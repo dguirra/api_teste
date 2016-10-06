@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm import relationship
-from api_teste import db
+from app import db
 
 
 class Occupation(db.Model):

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from app import create_app
-from views import *
+from flask import request, jsonify
+from models import Occupation, User, db
+from sqlalchemy import or_
+
 app = create_app()
 
 
