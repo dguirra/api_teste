@@ -4,7 +4,7 @@ from app import db
 
 class Occupation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    occupation = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.String(100), unique=True, nullable=False)
 
 
 class User(db.Model):
