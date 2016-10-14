@@ -48,13 +48,15 @@ def delete_occupation(id):
 # user
 @app.route('/user', methods=["POST"])
 def add_user():
+    import ipdb
+    ipdb.set_trace()
     data = request.json
     if isinstance(data, dict):  # Checa se é 'dict'
         user = User()
         user.name = data.get('name')
         user.last_name = data.get('last_name')
         user.birth = data.get('birth')
-        _occupation = Occupation.query.filter_by(occupation=data.get('occupation')).one()
+        _occupation = Occupation.query.filter_by(description=data.get('occupation')).first()
         user.id_occupation = _occupation.id
         db.session.add(user)
 
@@ -64,7 +66,7 @@ def add_user():
             user.name = row.get('name')
             user.last_name = row.get('last_name')
             user.birth = row.get('birth')
-            _occupation = Occupation.query.filter_by(occupation=row.get('occupation')).one()
+            _occupation = Occupation.query.filter_by(description=row.get('occupation')).first()
             user.id_occupation = _occupation.id
             db.session.add(user)
     else:
@@ -72,8 +74,7 @@ def add_user():
     db.session.commit()
 
     return jsonify({"name": user.name, "last_name": user.last_name,
-                    "birth": user.birth, "occupation": user.occupation,
-                    "occupation": _occupation.occupation, "id": user.id})
+                    "birth": user.birth, "id_occupation": _occupation.occupation, "id": user.id})
 
 
 @app.route('/user/<id>')  # Por default é GET
