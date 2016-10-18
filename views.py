@@ -2,7 +2,7 @@
 from app import create_app
 from flask import request, jsonify
 from models import Occupation, User, db
-from sqlalchemy import or_, join
+from sqlalchemy import or_
 
 app = create_app()
 
@@ -77,19 +77,14 @@ def add_user():
 
 @app.route('/user/<params>')  # Por default é GET
 def get_user(params):
-    import ipdb
-    ipdb.set_trace()
     query = User.query
     query = query.with_entities(User.name, User.last_name, User.birth,
                                 Occupation.description, User.id)
     query = query.join(Occupation)
-
     query = query.filter(or_(User.name == params, User.last_name == params))
     user = query.all()
-    
     user_dict = [data._asdict() for data in user]
     return jsonify(dict(user=user_dict)), 200
-    #return jsonify({"Status": "User don't founded"})    
 
 
 @app.route('/user/<id>', methods=["DELETE"])
