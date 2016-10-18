@@ -2,7 +2,7 @@
 from app import create_app
 from flask import request, jsonify
 from models import Occupation, User, db
-from sqlalchemy import or_
+from sqlalchemy import or_, join
 
 app = create_app()
 
@@ -48,8 +48,6 @@ def delete_occupation(id):
 # user
 @app.route('/user', methods=["POST"])
 def add_user():
-    import ipdb
-    ipdb.set_trace()
     data = request.json
     if isinstance(data, dict):  # Checa se é 'dict'
         user = User()
@@ -74,15 +72,24 @@ def add_user():
     db.session.commit()
 
     return jsonify({"name": user.name, "last_name": user.last_name,
-                    "birth": user.birth, "id_occupation": _occupation.occupation, "id": user.id})
+                    "birth": user.birth, "id_occupation": _occupation.description, "id": user.id})
 
 
-@app.route('/user/<id>')  # Por default é GET
-def get_user(id):
-    user = User.query.filter_by(id=id).first_or_404()
-    return jsonify({"name": user.name, "last_name": user.last_name,
-                    "birth": user.birth, "occupation": user.occupation,
-                    "id": user.id})
+@app.route('/user/<params>')  # Por default é GET
+def get_user(params):
+    import ipdb
+    ipdb.set_trace()
+    query = User.query
+    query = query.with_entities(User.name, User.last_name, User.birth,
+                                Occupation.description, User.id)
+    query = query.join(Occupation)
+
+    query = query.filter(or_(User.name == params, User.last_name == params))
+    user = query.all()
+    
+    user_dict = [data._asdict() for data in user]
+    return jsonify(dict(user=user_dict)), 200
+    #return jsonify({"Status": "User don't founded"})    
 
 
 @app.route('/user/<id>', methods=["DELETE"])
